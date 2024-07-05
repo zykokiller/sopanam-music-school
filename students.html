@@ -41,7 +41,7 @@
         th {
             background-color: #f2f2f2;
         }
-        .deleteBtn {
+        .delete-button {
             color: red;
             cursor: pointer;
         }
@@ -53,93 +53,59 @@
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="add_students.html">Add Students</a></li>
-                <li><a href="fees.html">Fees</a></li>
                 <li><a href="students.html">Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
                 <li><a href="pending_fees.html">Pending Fees</a></li>
             </ul>
         </nav>
     </div>
-    <h1>Students - Sopanam Music School</h1>
-
-    <table id="studentsTable">
+    <h2>Students</h2>
+    <table>
         <thead>
             <tr>
-                <th>Student Name</th>
+                <th>Name</th>
                 <th>Address</th>
                 <th>Batch Time</th>
                 <th>Date of Admission</th>
                 <th>WhatsApp Number</th>
                 <th>Phone Number</th>
-                <th>Actions</th>
+                <th>Delete</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Student information will be dynamically added here -->
-        </tbody>
+        <tbody id="studentsTableBody"></tbody>
     </table>
 
     <script>
-        function initializeStudents() {
-            var students = JSON.parse(localStorage.getItem('students'));
-            if (!students) {
-                students = [];
-                localStorage.setItem('students', JSON.stringify(students));
-            }
-            return students;
-        }
+        function loadStudents() {
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            let tableBody = document.getElementById('studentsTableBody');
+            tableBody.innerHTML = '';
 
-        function displayStudents() {
-            var students = initializeStudents();
-            var tbody = document.querySelector('#studentsTable tbody');
-            tbody.innerHTML = '';
+            students.forEach((student, index) => {
+                let row = document.createElement('tr');
 
-            students.forEach(function(student, index) {
-                var tr = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.address}</td>
+                    <td>${student.batchTime}</td>
+                    <td>${student.admissionDate}</td>
+                    <td>${student.whatsappNumber}</td>
+                    <td>${student.phoneNumber}</td>
+                    <td><span class="delete-button" onclick="deleteStudent(${index})">Delete</span></td>
+                `;
 
-                var tdName = document.createElement('td');
-                tdName.textContent = student.studentName;
-                tr.appendChild(tdName);
-
-                var tdAddress = document.createElement('td');
-                tdAddress.textContent = student.address;
-                tr.appendChild(tdAddress);
-
-                var tdBatchTime = document.createElement('td');
-                tdBatchTime.textContent = student.batchTime;
-                tr.appendChild(tdBatchTime);
-
-                var tdAdmissionDate = document.createElement('td');
-                tdAdmissionDate.textContent = student.admissionDate;
-                tr.appendChild(tdAdmissionDate);
-
-                var tdWhatsappNumber = document.createElement('td');
-                tdWhatsappNumber.textContent = student.whatsappNumber;
-                tr.appendChild(tdWhatsappNumber);
-
-                var tdPhoneNumber = document.createElement('td');
-                tdPhoneNumber.textContent = student.phoneNumber;
-                tr.appendChild(tdPhoneNumber);
-
-                var tdActions = document.createElement('td');
-                var deleteBtn = document.createElement('span');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.classList.add('deleteBtn');
-                deleteBtn.dataset.index = index;
-                deleteBtn.addEventListener('click', function() {
-                    var students = initializeStudents();
-                    students.splice(this.dataset.index, 1);
-                    localStorage.setItem('students', JSON.stringify(students));
-                    displayStudents();
-                });
-                tdActions.appendChild(deleteBtn);
-                tr.appendChild(tdActions);
-
-                tbody.appendChild(tr);
+                tableBody.appendChild(row);
             });
         }
 
-        // Call function on page load
-        displayStudents();
+        function deleteStudent(index) {
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            students.splice(index, 1);
+            localStorage.setItem('students', JSON.stringify(students));
+            loadStudents();
+        }
+
+        window.onload = loadStudents;
     </script>
 </body>
 </html>
