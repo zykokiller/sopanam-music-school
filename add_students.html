@@ -5,16 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Students - Sopanam Music School</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
         #mainMenu {
             background-color: #333;
-            color: #fff;
             padding: 10px;
+            text-align: center;
         }
         #mainMenu nav ul {
             list-style-type: none;
             margin: 0;
             padding: 0;
-            text-align: center;
         }
         #mainMenu nav ul li {
             display: inline;
@@ -28,11 +32,37 @@
         #mainMenu nav ul li a:hover {
             background-color: #555;
         }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
         form {
-            margin-top: 20px;
+            width: 300px;
+            margin: 0 auto;
         }
         form div {
             margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
         }
     </style>
 </head>
@@ -41,10 +71,10 @@
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
-                <li><a href="addstudents.html">Add Students</a></li>
+                <li><a href="add_students.html">Add Students</a></li>
                 <li><a href="fees.html">Fees</a></li>
                 <li><a href="students.html">Students</a></li>
-                <li><a href="pendingfees.html">Pending Fees</a></li>
+                <li><a href="pending_fees.html">Pending Fees</a></li>
             </ul>
         </nav>
     </div>
