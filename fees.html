@@ -4,48 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fees - Sopanam Music School</title>
-    <style>
-        #mainMenu {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-        }
-        #mainMenu nav ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        #mainMenu nav ul li {
-            display: inline;
-            margin-right: 10px;
-        }
-        #mainMenu nav ul li a {
-            color: #fff;
-            text-decoration: none;
-            padding: 5px 10px;
-        }
-        #mainMenu nav ul li a:hover {
-            background-color: #555;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .checkbox {
-            text-align: center;
-        }
-    </style>
-    <script type="module">
+    <!-- Firebase SDK -->
+  <script type="module">
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
@@ -68,20 +28,59 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 </script>
+        async function loadStudents() {
+            const querySnapshot = await getDocs(collection(db, "students"));
+            querySnapshot.forEach((doc) => {
+                const student = doc.data();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.batchTime}</td>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="january_${doc.id}" onchange="updateFee('${doc.id}', 'January', this.checked)">
+                            January
+                        </label>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="february_${doc.id}" onchange="updateFee('${doc.id}', 'February', this.checked)">
+                            February
+                        </label>
+                    </td>
+                    <!-- Add checkboxes for other months as needed -->
+                `;
+                document.getElementById('studentsTableBody').appendChild(row);
+            });
+        }
+
+        async function updateFee(studentId, month, isChecked) {
+            try {
+                const studentDocRef = doc(db, "students", studentId);
+                const studentDoc = await getDoc(studentDocRef);
+                if (studentDoc.exists()) {
+                    let updatedMonths = studentDoc.data().paidMonths || [];
+                    if (isChecked) {
+                        updatedMonths.push(month);
+                    } else {
+                        updatedMonths = updatedMonths.filter(m => m !== month);
+                    }
+                    await updateDoc(studentDocRef, { paidMonths: updatedMonths });
+                    alert('Fee updated successfully!');
+                } else {
+                    console.log("No such document!");
+                }
+            } catch (error) {
+                console.error("Error updating fee: ", error);
+                alert('Failed to update fee. Please try again later.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadStudents);
+    </script>
 </head>
 <body>
-    <div id="mainMenu">
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="add_students.html">Add Students</a></li>
-                <li><a href="students.html">Students</a></li>
-                <li><a href="fees.html">Fees</a></li>
-                <li><a href="pending_fees.html">Pending Fees</a></li>
-            </ul>
-        </nav>
-    </div>
-    <h2>Fees</h2>
+    <h1>Fees Page</h1>
     <table>
         <thead>
             <tr>
@@ -89,68 +88,12 @@
                 <th>Batch Time</th>
                 <th>January</th>
                 <th>February</th>
-                <th>March</th>
-                <th>April</th>
-                <th>May</th>
-                <th>June</th>
-                <th>July</th>
-                <th>August</th>
-                <th>September</th>
-                <th>October</th>
-                <th>November</th>
-                <th>December</th>
+                <!-- Add headers for other months as needed -->
             </tr>
         </thead>
-        <tbody id="feesTableBody"></tbody>
+        <tbody id="studentsTableBody">
+            <!-- Student data will be dynamically added here -->
+        </tbody>
     </table>
-    <button onclick="saveFees()">Save Fees</button>
-
-    <script>
-        function loadStudentsForFees() {
-            let students = JSON.parse(localStorage.getItem('students')) || [];
-            let fees = JSON.parse(localStorage.getItem('fees')) || {};
-            let tableBody = document.getElementById('feesTableBody');
-            tableBody.innerHTML = '';
-
-            students.forEach(student => {
-                let row = document.createElement('tr');
-
-                row.innerHTML = `
-                    <td>${student.name}</td>
-                    <td>${student.batchTime}</td>
-                    ${generateCheckboxes(student.name, fees)}
-                `;
-
-                tableBody.appendChild(row);
-            });
-        }
-
-        function generateCheckboxes(name, fees) {
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            let checkboxes = '';
-            months.forEach((month, index) => {
-                let checked = fees[name] && fees[name][index] ? 'checked' : '';
-                checkboxes += `<td class="checkbox"><input type="checkbox" data-name="${name}" data-month="${index}" ${checked}></td>`;
-            });
-            return checkboxes;
-        }
-
-        function saveFees() {
-            let fees = {};
-            let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                let name = checkbox.getAttribute('data-name');
-                let month = checkbox.getAttribute('data-month');
-                if (!fees[name]) {
-                    fees[name] = [];
-                }
-                fees[name][month] = checkbox.checked;
-            });
-            localStorage.setItem('fees', JSON.stringify(fees));
-            alert('Fees saved successfully!');
-        }
-
-        window.onload = loadStudentsForFees;
-    </script>
 </body>
 </html>
