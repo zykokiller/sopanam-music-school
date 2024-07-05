@@ -128,7 +128,7 @@
                 const student = doc.data();
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${student.name}</td>
+                    <td>${student.studentName}</td>
                     <td>${student.batchTime}</td>
                     ${generateCheckboxes(student, doc.id)}
                 `;
@@ -139,29 +139,14 @@
         function generateCheckboxes(student, docId) {
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             return months.map((month, index) => {
-                const checked = student.paidMonths.includes(index + 1) ? 'checked' : '';
-                return `<td><input type="checkbox" ${checked} onchange="updatePaymentStatus('${docId}', ${index + 1}, this.checked)"></td>`;
+                const paid = student[`paid_month${index + 1}`];
+                return `<td><input type="checkbox" ${paid ? 'checked' : ''} onchange="updatePaymentStatus('${docId}', ${index + 1}, this.checked)"></td>`;
             }).join('');
         }
 
         window.updatePaymentStatus = async function(docId, month, status) {
             const studentRef = doc(db, 'students', docId);
-            const studentDoc = await studentRef.get();
-            const student = studentDoc.data();
-            const paidMonths = student.paidMonths;
-
-            if (status) {
-                if (!paidMonths.includes(month)) {
-                    paidMonths.push(month);
-                }
-            } else {
-                const index = paidMonths.indexOf(month);
-                if (index > -1) {
-                    paidMonths.splice(index, 1);
-                }
-            }
-
-            await updateDoc(studentRef, { paidMonths });
+            await updateDoc(studentRef, { [`paid_month${month}`]: status });
         };
 
         window.onload = loadFees;
