@@ -59,6 +59,7 @@
             color: #fff;
             border: none;
             cursor: pointer;
+            margin-top: 20px;
         }
         button:hover {
             background-color: #555;
@@ -87,7 +88,6 @@
                 <th>Date of Admission</th>
                 <th>WhatsApp Number</th>
                 <th>Phone Number</th>
-                <th>Action</th>
             </tr>
         </thead>
         <tbody id="studentsTableBody">
@@ -97,7 +97,7 @@
     <script type="module">
         // Import Firebase functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -121,23 +121,16 @@
                 const student = doc.data();
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${student.name}</td>
+                    <td>${student.studentName}</td>
                     <td>${student.address}</td>
                     <td>${student.batchTime}</td>
                     <td>${student.admissionDate}</td>
                     <td>${student.whatsappNumber}</td>
                     <td>${student.phoneNumber}</td>
-                    <td><button onclick="deleteStudent('${doc.id}')">Delete</button></td>
                 `;
                 studentsTableBody.appendChild(row);
             });
         }
-
-        window.deleteStudent = async function(docId) {
-            await deleteDoc(doc(db, 'students', docId));
-            alert('Student deleted successfully!');
-            location.reload();
-        };
 
         window.onload = loadStudents;
     </script>
