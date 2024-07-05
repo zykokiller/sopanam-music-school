@@ -29,10 +29,39 @@
             background-color: #555;
         }
         form {
-            margin-top: 20px;
+            max-width: 400px;
+            margin: auto;
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 1em;
         }
-        form div {
-            margin-bottom: 10px;
+        form div + div {
+            margin-top: 1em;
+        }
+        label {
+            display: inline-block;
+            width: 90px;
+            text-align: right;
+        }
+        input, textarea {
+            font: 1em sans-serif;
+            width: 300px;
+            box-sizing: border-box;
+            border: 1px solid #999;
+        }
+        input:focus, textarea:focus {
+            border-color: #000;
+        }
+        textarea {
+            vertical-align: top;
+            height: 5em;
+            resize: vertical;
+        }
+        .button {
+            padding-left: 90px;
+        }
+        button {
+            margin-left: .5em;
         }
     </style>
 </head>
@@ -42,69 +71,61 @@
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="add_students.html">Add Students</a></li>
-                <li><a href="fees.html">Fees</a></li>
                 <li><a href="students.html">Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
                 <li><a href="pending_fees.html">Pending Fees</a></li>
             </ul>
         </nav>
     </div>
-    <h1>Add Students - Sopanam Music School</h1>
+    <h2>Add Student</h2>
     <form id="addStudentForm">
         <div>
-            <label for="studentName">Student Name:</label>
-            <input type="text" id="studentName" name="studentName" required>
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
         </div>
         <div>
             <label for="address">Address:</label>
-            <input type="text" id="address" name="address" required>
+            <textarea id="address" required></textarea>
         </div>
         <div>
             <label for="batchTime">Batch Time:</label>
-            <input type="text" id="batchTime" name="batchTime" required>
+            <input type="text" id="batchTime" required>
         </div>
         <div>
             <label for="admissionDate">Date of Admission:</label>
-            <input type="date" id="admissionDate" name="admissionDate" required>
+            <input type="date" id="admissionDate" required>
         </div>
         <div>
             <label for="whatsappNumber">WhatsApp Number:</label>
-            <input type="text" id="whatsappNumber" name="whatsappNumber" required>
+            <input type="tel" id="whatsappNumber">
         </div>
         <div>
             <label for="phoneNumber">Phone Number:</label>
-            <input type="text" id="phoneNumber" name="phoneNumber" required>
+            <input type="tel" id="phoneNumber">
         </div>
-        <button type="submit">Add Student</button>
+        <div class="button">
+            <button type="submit">Add Student</button>
+        </div>
     </form>
 
     <script>
-        document.getElementById('addStudentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            var students = JSON.parse(localStorage.getItem('students')) || [];
-            var newStudent = {
-                studentName: document.getElementById('studentName').value,
+        document.getElementById('addStudentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            let student = {
+                name: document.getElementById('name').value,
                 address: document.getElementById('address').value,
                 batchTime: document.getElementById('batchTime').value,
                 admissionDate: document.getElementById('admissionDate').value,
                 whatsappNumber: document.getElementById('whatsappNumber').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
-                paid_month1: false,
-                paid_month2: false,
-                paid_month3: false,
-                paid_month4: false,
-                paid_month5: false,
-                paid_month6: false,
-                paid_month7: false,
-                paid_month8: false,
-                paid_month9: false,
-                paid_month10: false,
-                paid_month11: false,
-                paid_month12: false
+                phoneNumber: document.getElementById('phoneNumber').value
             };
-            students.push(newStudent);
+
+            students.push(student);
             localStorage.setItem('students', JSON.stringify(students));
             alert('Student added successfully!');
-            this.reset();
+            document.getElementById('addStudentForm').reset();
         });
     </script>
 </body>
