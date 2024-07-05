@@ -4,44 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pending Fees - Sopanam Music School</title>
-    <style>
-        #mainMenu {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-        }
-        #mainMenu nav ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        #mainMenu nav ul li {
-            display: inline;
-            margin-right: 10px;
-        }
-        #mainMenu nav ul li a {
-            color: #fff;
-            text-decoration: none;
-            padding: 5px 10px;
-        }
-        #mainMenu nav ul li a:hover {
-            background-color: #555;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <!-- Firebase SDK -->
     <script type="module">
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
@@ -65,70 +28,43 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 </script>
+
+        async function loadPendingFees() {
+            try {
+                const pendingFeesQuery = query(collection(db, "students"), where("paidMonths", "==", []));
+                const querySnapshot = await getDocs(pendingFeesQuery);
+                querySnapshot.forEach((doc) => {
+                    const student = doc.data();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${student.name}</td>
+                        <td>${student.batchTime}</td>
+                        <!-- Add additional student details as needed -->
+                    `;
+                    document.getElementById('pendingFeesTableBody').appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error loading pending fees: ", error);
+                alert('Failed to load pending fees. Please try again later.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPendingFees);
+    </script>
 </head>
 <body>
-    <div id="mainMenu">
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="add_students.html">Add Students</a></li>
-                <li><a href="students.html">Students</a></li>
-                <li><a href="fees.html">Fees</a></li>
-                <li><a href="pending_fees.html">Pending Fees</a></li>
-            </ul>
-        </nav>
-    </div>
-    <h2>Pending Fees</h2>
+    <h1>Pending Fees Page</h1>
     <table>
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Batch Time</th>
-                <th>Unpaid Months</th>
+                <!-- Add headers for additional student details as needed -->
             </tr>
         </thead>
-        <tbody id="pendingFeesTableBody"></tbody>
+        <tbody id="pendingFeesTableBody">
+            <!-- Pending fees data will be dynamically added here -->
+        </tbody>
     </table>
-
-    <script>
-        function loadPendingFees() {
-            let students = JSON.parse(localStorage.getItem('students')) || [];
-            let fees = JSON.parse(localStorage.getItem('fees')) || {};
-            let tableBody = document.getElementById('pendingFeesTableBody');
-            tableBody.innerHTML = '';
-
-            students.forEach(student => {
-                let unpaidMonths = getUnpaidMonths(student.name, fees);
-                if (unpaidMonths.length > 0) {
-                    let row = document.createElement('tr');
-
-                    row.innerHTML = `
-                        <td>${student.name}</td>
-                        <td>${student.batchTime}</td>
-                        <td>${unpaidMonths.join(', ')}</td>
-                    `;
-
-                    tableBody.appendChild(row);
-                }
-            });
-        }
-
-        function getUnpaidMonths(name, fees) {
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            let unpaidMonths = [];
-            if (fees[name]) {
-                fees[name].forEach((paid, index) => {
-                    if (!paid) {
-                        unpaidMonths.push(months[index]);
-                    }
-                });
-            } else {
-                unpaidMonths = months; // If no fee record exists, consider all months unpaid
-            }
-            return unpaidMonths;
-        }
-
-        window.onload = loadPendingFees;
-    </script>
 </body>
 </html>
