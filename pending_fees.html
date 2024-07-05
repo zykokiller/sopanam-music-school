@@ -51,6 +51,18 @@
         th {
             background-color: #f2f2f2;
         }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
     </style>
 </head>
 <body>
@@ -71,7 +83,7 @@
             <tr>
                 <th>Student Name</th>
                 <th>Batch Time</th>
-                <th>Unpaid Months</th>
+                <th>Pending Months</th>
             </tr>
         </thead>
         <tbody id="pendingFeesTableBody">
@@ -103,22 +115,22 @@
             const pendingFeesTableBody = document.getElementById('pendingFeesTableBody');
             querySnapshot.forEach((doc) => {
                 const student = doc.data();
-                const unpaidMonths = getUnpaidMonths(student.paidMonths);
-                if (unpaidMonths.length > 0) {
+                const pendingMonths = getPendingMonths(student);
+                if (pendingMonths.length > 0) {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${student.name}</td>
+                        <td>${student.studentName}</td>
                         <td>${student.batchTime}</td>
-                        <td>${unpaidMonths.join(', ')}</td>
+                        <td>${pendingMonths.join(', ')}</td>
                     `;
                     pendingFeesTableBody.appendChild(row);
                 }
             });
         }
 
-        function getUnpaidMonths(paidMonths) {
+        function getPendingMonths(student) {
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            return months.filter((month, index) => !paidMonths.includes(index + 1));
+            return months.filter((month, index) => !student[`paid_month${index + 1}`]);
         }
 
         window.onload = loadPendingFees;
