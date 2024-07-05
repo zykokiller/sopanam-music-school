@@ -4,163 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Students - Sopanam Music School</title>
-    <style>
-        #mainMenu {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-        }
-        #mainMenu nav ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        #mainMenu nav ul li {
-            display: inline;
-            margin-right: 10px;
-        }
-        #mainMenu nav ul li a {
-            color: #fff;
-            text-decoration: none;
-            padding: 5px 10px;
-        }
-        #mainMenu nav ul li a:hover {
-            background-color: #555;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .deleteBtn {
-            color: red;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
-    <div id="mainMenu">
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="add_students.html">Add Students</a></li>
-                <li><a href="fees.html">Fees</a></li>
-                <li><a href="students.html">Students</a></li>
-                <li><a href="pending_fees.html">Pending Fees</a></li>
-            </ul>
-        </nav>
-    </div>
-    <h1>Students - Sopanam Music School</h1>
-
-    <table id="studentsTable">
+    <h1>Students Page</h1>
+    <table>
         <thead>
             <tr>
-                <th>Student Name</th>
+                <th>Name</th>
                 <th>Address</th>
                 <th>Batch Time</th>
                 <th>Date of Admission</th>
                 <th>WhatsApp Number</th>
                 <th>Phone Number</th>
-                <th>Actions</th>
+                <th>Action</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Student information will be dynamically added here -->
+        <tbody id="studentsTableBody">
+            <!-- Student data will be dynamically added here -->
         </tbody>
     </table>
 
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
-    authDomain: "sopanam-fees-site.firebaseapp.com",
-    projectId: "sopanam-fees-site",
-    storageBucket: "sopanam-fees-site.appspot.com",
-    messagingSenderId: "875694835618",
-    appId: "1:875694835618:web:f28cddc9758eddd40914fb",
-    measurementId: "G-JMR44EQ6M8"
-  };
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
+            authDomain: "sopanam-fees-site.firebaseapp.com",
+            projectId: "sopanam-fees-site",
+            storageBucket: "sopanam-fees-site.appspot.com",
+            messagingSenderId: "875694835618",
+            appId: "1:875694835618:web:f28cddc9758eddd40914fb",
+            measurementId: "G-JMR44EQ6M8"
+        };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-        function initializeStudents() {
-            var students = JSON.parse(localStorage.getItem('students'));
-            if (!students) {
-                students = [];
-                localStorage.setItem('students', JSON.stringify(students));
-            }
-            return students;
-        }
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        function displayStudents() {
-            var students = initializeStudents();
-            var tbody = document.querySelector('#studentsTable tbody');
-            tbody.innerHTML = '';
-
-            students.forEach(function(student, index) {
-                var tr = document.createElement('tr');
-
-                var tdName = document.createElement('td');
-                tdName.textContent = student.studentName;
-                tr.appendChild(tdName);
-
-                var tdAddress = document.createElement('td');
-                tdAddress.textContent = student.address;
-                tr.appendChild(tdAddress);
-
-                var tdBatchTime = document.createElement('td');
-                tdBatchTime.textContent = student.batchTime;
-                tr.appendChild(tdBatchTime);
-
-                var tdAdmissionDate = document.createElement('td');
-                tdAdmissionDate.textContent = student.admissionDate;
-                tr.appendChild(tdAdmissionDate);
-
-                var tdWhatsappNumber = document.createElement('td');
-                tdWhatsappNumber.textContent = student.whatsappNumber;
-                tr.appendChild(tdWhatsappNumber);
-
-                var tdPhoneNumber = document.createElement('td');
-                tdPhoneNumber.textContent = student.phoneNumber;
-                tr.appendChild(tdPhoneNumber);
-
-                var tdActions = document.createElement('td');
-                var deleteBtn = document.createElement('span');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.classList.add('deleteBtn');
-                deleteBtn.dataset.index = index;
-                deleteBtn.addEventListener('click', function() {
-                    var students = initializeStudents();
-                    students.splice(this.dataset.index, 1);
-                    localStorage.setItem('students', JSON.stringify(students));
-                    displayStudents();
-                });
-                tdActions.appendChild(deleteBtn);
-                tr.appendChild(tdActions);
-
-                tbody.appendChild(tr);
+        async function loadStudents() {
+            const studentsRef = collection(db, 'students');
+            const querySnapshot = await getDocs(studentsRef);
+            querySnapshot.forEach((doc) => {
+                const student = doc.data();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.address}</td>
+                    <td>${student.batchTime}</td>
+                    <td>${student.admissionDate}</td>
+                    <td>${student.whatsappNumber}</td>
+                    <td>${student.phoneNumber}</td>
+                    <td><button onclick="deleteStudent('${doc.id}')">Delete</button></td>
+                `;
+                document.getElementById('studentsTableBody').appendChild(row);
             });
         }
 
-        // Call function on page load
-        displayStudents();
+        async function deleteStudent(studentId) {
+            if (confirm("Are you sure you want to delete this student?")) {
+                await deleteDoc(doc(db, 'students', studentId));
+                alert("Student deleted successfully!");
+                location.reload();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadStudents);
     </script>
 </body>
 </html>
