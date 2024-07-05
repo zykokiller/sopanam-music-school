@@ -4,65 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fees - Sopanam Music School</title>
-    <!-- Firebase SDK -->
-    <script type="module" src="firebaseConfig.js"></script>
-    <script type="module">
-        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-
-        const db = getFirestore();
-
-        async function loadStudents() {
-            const studentsRef = collection(db, 'students');
-            const querySnapshot = await getDocs(studentsRef);
-            querySnapshot.forEach((doc) => {
-                const student = doc.data();
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.name}</td>
-                    <td>${student.batchTime}</td>
-                    <td><input type="checkbox" id="january_${doc.id}" onchange="updateFee('${doc.id}', 'January', this.checked)"></td>
-                    <td><input type="checkbox" id="february_${doc.id}" onchange="updateFee('${doc.id}', 'February', this.checked)"></td>
-                    <!-- Add checkboxes for other months as needed -->
-                `;
-                document.getElementById('studentsTableBody').appendChild(row);
-            });
+    <style>
+        #mainMenu {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
         }
-
-        async function updateFee(studentId, month, isChecked) {
-            const studentDocRef = doc(db, 'students', studentId);
-            const studentDoc = await getDoc(studentDocRef);
-            if (studentDoc.exists()) {
-                let updatedMonths = studentDoc.data().paidMonths || [];
-                if (isChecked && !updatedMonths.includes(month)) {
-                    updatedMonths.push(month);
-                } else {
-                    updatedMonths = updatedMonths.filter(m => m !== month);
-                }
-                await updateDoc(studentDocRef, { paidMonths: updatedMonths });
-                alert(`Fee for ${month} updated successfully!`);
-            } else {
-                console.log('No such document!');
-            }
+        #mainMenu nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
         }
-
-        document.addEventListener('DOMContentLoaded', loadStudents);
-    </script>
+        #mainMenu nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        #mainMenu nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        #mainMenu nav ul li a:hover {
+            background-color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
-    <h1>Fees Page</h1>
-    <table>
+    <div id="mainMenu">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add_students.html">Add Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="pending_fees.html">Pending Fees</a></li>
+            </ul>
+        </nav>
+    </div>
+    <h1>Fees - Sopanam Music School</h1>
+
+    <table id="feesTable">
         <thead>
             <tr>
-                <th>Name</th>
+                <th>Student Name</th>
                 <th>Batch Time</th>
                 <th>January</th>
                 <th>February</th>
-                <!-- Add headers for other months as needed -->
+                <th>March</th>
+                <th>April</th>
+                <th>May</th>
+                <th>June</th>
+                <th>July</th>
+                <th>August</th>
+                <th>September</th>
+                <th>October</th>
+                <th>November</th>
+                <th>December</th>
             </tr>
         </thead>
-        <tbody id="studentsTableBody">
-            <!-- Student data will be dynamically added here -->
+        <tbody>
+            <!-- Fees information will be dynamically added here -->
         </tbody>
     </table>
+
+    <script>
+        function initializeStudents() {
+            var students = JSON.parse(localStorage.getItem('students'));
+            if (!students) {
+                students = [];
+                localStorage.setItem('students', JSON.stringify(students));
+            }
+            return students;
+        }
+
+        function displayStudents() {
+            var students = initializeStudents();
+            var tbody = document.querySelector('#feesTable tbody');
+            tbody.innerHTML = '';
+
+            students.forEach(function(student, index) {
+                var tr = document.createElement('tr');
+
+                var tdName = document.createElement('td');
+                tdName.textContent = student.studentName;
+                tr.appendChild(tdName);
+
+                var tdBatchTime = document.createElement('td');
+                tdBatchTime.textContent = student.batchTime;
+                tr.appendChild(tdBatchTime);
+
+                for (var i = 1; i <= 12; i++) {
+                    var td = document.createElement('td');
+                    var checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = student['paid_month' + i] || false;
+                    checkbox.dataset.studentIndex = index;
+                    checkbox.dataset.month = 'paid_month' + i;
+                    checkbox.addEventListener('change', function() {
+                        var students = initializeStudents();
+                        var studentIndex = this.dataset.studentIndex;
+                        var month = this.dataset.month;
+                        students[studentIndex][month] = this.checked;
+                        localStorage.setItem('students', JSON.stringify(students));
+                    });
+                    td.appendChild(checkbox);
+                    tr.appendChild(td);
+                }
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Call function on page load
+        displayStudents();
+    </script>
 </body>
 </html>
