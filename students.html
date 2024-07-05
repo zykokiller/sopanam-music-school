@@ -4,60 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Students - Sopanam Music School</title>
-    <!-- Firebase SDK -->
-    <script type="module" src="firebaseConfig.js"></script>
-    <script type="module">
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-
-        const db = getFirestore();
-
-        async function loadStudents() {
-            const studentsRef = collection(db, 'students');
-            const querySnapshot = await getDocs(studentsRef);
-            querySnapshot.forEach((doc) => {
-                const student = doc.data();
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.name}</td>
-                    <td>${student.address}</td>
-                    <td>${student.batchTime}</td>
-                    <td>${student.dateOfAdmission}</td>
-                    <td>${student.whatsappNumber}</td>
-                    <td>${student.phoneNumber}</td>
-                    <td><button onclick="deleteStudent('${doc.id}')">Delete</button></td>
-                `;
-                document.getElementById('studentsTableBody').appendChild(row);
-            });
+    <style>
+        #mainMenu {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
         }
-
-        async function deleteStudent(studentId) {
-            if (confirm("Are you sure you want to delete this student?")) {
-                await deleteDoc(doc(db, 'students', studentId));
-                alert("Student deleted successfully!");
-                location.reload(); // Refresh page
-            }
+        #mainMenu nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
         }
-
-        document.addEventListener('DOMContentLoaded', loadStudents);
-    </script>
+        #mainMenu nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        #mainMenu nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        #mainMenu nav ul li a:hover {
+            background-color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .deleteBtn {
+            color: red;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Students Page</h1>
-    <table>
+    <div id="mainMenu">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add_students.html">Add Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="pending_fees.html">Pending Fees</a></li>
+            </ul>
+        </nav>
+    </div>
+    <h1>Students - Sopanam Music School</h1>
+
+    <table id="studentsTable">
         <thead>
             <tr>
-                <th>Name</th>
+                <th>Student Name</th>
                 <th>Address</th>
                 <th>Batch Time</th>
                 <th>Date of Admission</th>
                 <th>WhatsApp Number</th>
                 <th>Phone Number</th>
-                <th>Action</th>
+                <th>Actions</th>
             </tr>
         </thead>
-        <tbody id="studentsTableBody">
-            <!-- Student data will be dynamically added here -->
+        <tbody>
+            <!-- Student information will be dynamically added here -->
         </tbody>
     </table>
+
+    <script>
+        function initializeStudents() {
+            var students = JSON.parse(localStorage.getItem('students'));
+            if (!students) {
+                students = [];
+                localStorage.setItem('students', JSON.stringify(students));
+            }
+            return students;
+        }
+
+        function displayStudents() {
+            var students = initializeStudents();
+            var tbody = document.querySelector('#studentsTable tbody');
+            tbody.innerHTML = '';
+
+            students.forEach(function(student, index) {
+                var tr = document.createElement('tr');
+
+                var tdName = document.createElement('td');
+                tdName.textContent = student.studentName;
+                tr.appendChild(tdName);
+
+                var tdAddress = document.createElement('td');
+                tdAddress.textContent = student.address;
+                tr.appendChild(tdAddress);
+
+                var tdBatchTime = document.createElement('td');
+                tdBatchTime.textContent = student.batchTime;
+                tr.appendChild(tdBatchTime);
+
+                var tdAdmissionDate = document.createElement('td');
+                tdAdmissionDate.textContent = student.admissionDate;
+                tr.appendChild(tdAdmissionDate);
+
+                var tdWhatsappNumber = document.createElement('td');
+                tdWhatsappNumber.textContent = student.whatsappNumber;
+                tr.appendChild(tdWhatsappNumber);
+
+                var tdPhoneNumber = document.createElement('td');
+                tdPhoneNumber.textContent = student.phoneNumber;
+                tr.appendChild(tdPhoneNumber);
+
+                var tdActions = document.createElement('td');
+                var deleteBtn = document.createElement('span');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.classList.add('deleteBtn');
+                deleteBtn.dataset.index = index;
+                deleteBtn.addEventListener('click', function() {
+                    var students = initializeStudents();
+                    students.splice(this.dataset.index, 1);
+                    localStorage.setItem('students', JSON.stringify(students));
+                    displayStudents();
+                });
+                tdActions.appendChild(deleteBtn);
+                tr.appendChild(tdActions);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Call function on page load
+        displayStudents();
+    </script>
 </body>
 </html>
