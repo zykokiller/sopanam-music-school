@@ -4,147 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Students - Sopanam Music School</title>
-    <style>
-        #mainMenu {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-        }
-        #mainMenu nav ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        #mainMenu nav ul li {
-            display: inline;
-            margin-right: 10px;
-        }
-        #mainMenu nav ul li a {
-            color: #fff;
-            text-decoration: none;
-            padding: 5px 10px;
-        }
-        #mainMenu nav ul li a:hover {
-            background-color: #555;
-        }
-        form {
-            max-width: 400px;
-            margin: auto;
-            padding: 1em;
-            border: 1px solid #ccc;
-            border-radius: 1em;
-        }
-        form div + div {
-            margin-top: 1em;
-        }
-        label {
-            display: inline-block;
-            width: 90px;
-            text-align: right;
-        }
-        input, textarea {
-            font: 1em sans-serif;
-            width: 300px;
-            box-sizing: border-box;
-            border: 1px solid #999;
-        }
-        input:focus, textarea:focus {
-            border-color: #000;
-        }
-        textarea {
-            vertical-align: top;
-            height: 5em;
-            resize: vertical;
-        }
-        .button {
-            padding-left: 90px;
-        }
-        button {
-            margin-left: .5em;
-        }
-    </style>
+    <!-- Firebase SDK -->
+    <script type="module" src="firebaseConfig.js"></script>
     <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
-            authDomain: "sopanam-fees-site.firebaseapp.com",
-            projectId: "sopanam-fees-site",
-            storageBucket: "sopanam-fees-site.appspot.com",
-            messagingSenderId: "875694835618",
-            appId: "1:875694835618:web:f28cddc9758eddd40914fb",
-            measurementId: "G-JMR44EQ6M8"
-        };
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
 
-        document.getElementById('addStudentForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
+        const db = getFirestore();
 
-            const student = {
-                name: document.getElementById('name').value,
-                address: document.getElementById('address').value,
-                batchTime: document.getElementById('batchTime').value,
-                admissionDate: document.getElementById('admissionDate').value,
-                whatsappNumber: document.getElementById('whatsappNumber').value,
-                phoneNumber: document.getElementById('phoneNumber').value
-            };
+        async function addStudent() {
+            const form = document.getElementById('addStudentForm');
+            const name = form.name.value;
+            const address = form.address.value;
+            const batchTime = form.batchTime.value;
+            const dateOfAdmission = form.dateOfAdmission.value;
+            const whatsappNumber = form.whatsappNumber.value;
+            const phoneNumber = form.phoneNumber.value;
 
             try {
-                await addDoc(collection(db, "students"), student);
+                await addDoc(collection(db, 'students'), {
+                    name,
+                    address,
+                    batchTime,
+                    dateOfAdmission,
+                    whatsappNumber,
+                    phoneNumber,
+                    paidMonths: [] // Initialize paidMonths as an empty array
+                });
                 alert('Student added successfully!');
-                document.getElementById('addStudentForm').reset();
+                form.reset(); // Clear form fields after submission
             } catch (error) {
-                console.error("Error adding student: ", error);
+                console.error('Error adding document: ', error);
+                alert('Error adding student. Please try again.');
             }
-        });
+        }
     </script>
 </head>
 <body>
-    <div id="mainMenu">
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="add_students.html">Add Students</a></li>
-                <li><a href="students.html">Students</a></li>
-                <li><a href="fees.html">Fees</a></li>
-                <li><a href="pending_fees.html">Pending Fees</a></li>
-            </ul>
-        </nav>
-    </div>
-    <h2>Add Student</h2>
-    <form id="addStudentForm">
-        <div>
-            <label for="name">Name:</label>
-            <input type="text" id="name" required>
-        </div>
-        <div>
-            <label for="address">Address:</label>
-            <textarea id="address" required></textarea>
-        </div>
-        <div>
-            <label for="batchTime">Batch Time:</label>
-            <input type="text" id="batchTime" required>
-        </div>
-        <div>
-            <label for="admissionDate">Date of Admission:</label>
-            <input type="date" id="admissionDate" required>
-        </div>
-        <div>
-            <label for="whatsappNumber">WhatsApp Number:</label>
-            <input type="tel" id="whatsappNumber">
-        </div>
-        <div>
-            <label for="phoneNumber">Phone Number:</label>
-            <input type="tel" id="phoneNumber">
-        </div>
-        <div class="button">
-            <button type="submit">Add Student</button>
-        </div>
-    </form>
-</body>
-</html>
+    <h1>Add Students Page</h1>
+    <form id="addStudentForm" onsubmit="event.preventDefault(); addStudent()">
+        <label for="name">Name:</label>
+        <input type="text" id
