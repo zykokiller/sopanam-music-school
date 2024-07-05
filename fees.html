@@ -41,6 +41,9 @@
         th {
             background-color: #f2f2f2;
         }
+        .checkbox {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -49,18 +52,17 @@
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="add_students.html">Add Students</a></li>
-                <li><a href="fees.html">Fees</a></li>
                 <li><a href="students.html">Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
                 <li><a href="pending_fees.html">Pending Fees</a></li>
             </ul>
         </nav>
     </div>
-    <h1>Fees - Sopanam Music School</h1>
-
-    <table id="feesTable">
+    <h2>Fees</h2>
+    <table>
         <thead>
             <tr>
-                <th>Student Name</th>
+                <th>Name</th>
                 <th>Batch Time</th>
                 <th>January</th>
                 <th>February</th>
@@ -76,61 +78,56 @@
                 <th>December</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Fees information will be dynamically added here -->
-        </tbody>
+        <tbody id="feesTableBody"></tbody>
     </table>
+    <button onclick="saveFees()">Save Fees</button>
 
     <script>
-        function initializeStudents() {
-            var students = JSON.parse(localStorage.getItem('students'));
-            if (!students) {
-                students = [];
-                localStorage.setItem('students', JSON.stringify(students));
-            }
-            return students;
-        }
+        function loadStudentsForFees() {
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            let fees = JSON.parse(localStorage.getItem('fees')) || {};
+            let tableBody = document.getElementById('feesTableBody');
+            tableBody.innerHTML = '';
 
-        function displayStudents() {
-            var students = initializeStudents();
-            var tbody = document.querySelector('#feesTable tbody');
-            tbody.innerHTML = '';
+            students.forEach(student => {
+                let row = document.createElement('tr');
 
-            students.forEach(function(student, index) {
-                var tr = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.batchTime}</td>
+                    ${generateCheckboxes(student.name, fees)}
+                `;
 
-                var tdName = document.createElement('td');
-                tdName.textContent = student.studentName;
-                tr.appendChild(tdName);
-
-                var tdBatchTime = document.createElement('td');
-                tdBatchTime.textContent = student.batchTime;
-                tr.appendChild(tdBatchTime);
-
-                for (var i = 1; i <= 12; i++) {
-                    var td = document.createElement('td');
-                    var checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.checked = student['paid_month' + i] || false;
-                    checkbox.dataset.studentIndex = index;
-                    checkbox.dataset.month = 'paid_month' + i;
-                    checkbox.addEventListener('change', function() {
-                        var students = initializeStudents();
-                        var studentIndex = this.dataset.studentIndex;
-                        var month = this.dataset.month;
-                        students[studentIndex][month] = this.checked;
-                        localStorage.setItem('students', JSON.stringify(students));
-                    });
-                    td.appendChild(checkbox);
-                    tr.appendChild(td);
-                }
-
-                tbody.appendChild(tr);
+                tableBody.appendChild(row);
             });
         }
 
-        // Call function on page load
-        displayStudents();
+        function generateCheckboxes(name, fees) {
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            let checkboxes = '';
+            months.forEach((month, index) => {
+                let checked = fees[name] && fees[name][index] ? 'checked' : '';
+                checkboxes += `<td class="checkbox"><input type="checkbox" data-name="${name}" data-month="${index}" ${checked}></td>`;
+            });
+            return checkboxes;
+        }
+
+        function saveFees() {
+            let fees = {};
+            let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                let name = checkbox.getAttribute('data-name');
+                let month = checkbox.getAttribute('data-month');
+                if (!fees[name]) {
+                    fees[name] = [];
+                }
+                fees[name][month] = checkbox.checked;
+            });
+            localStorage.setItem('fees', JSON.stringify(fees));
+            alert('Fees saved successfully!');
+        }
+
+        window.onload = loadStudentsForFees;
     </script>
 </body>
 </html>
