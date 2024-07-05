@@ -32,25 +32,22 @@
         #mainMenu nav ul li a:hover {
             background-color: #555;
         }
-        h1 {
-            text-align: center;
-            margin: 20px 0;
-        }
         form {
-            width: 300px;
-            margin: 0 auto;
+            margin-top: 20px;
+            width: 50%;
+            margin: 20px auto;
         }
         form div {
             margin-bottom: 10px;
         }
         label {
-            display: block;
-            margin-bottom: 5px;
+            display: inline-block;
+            width: 150px;
         }
-        input[type="text"], input[type="date"] {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
+        input[type="text"],
+        input[type="date"] {
+            width: calc(100% - 160px);
+            padding: 5px;
         }
         button {
             display: block;
@@ -60,6 +57,7 @@
             color: #fff;
             border: none;
             cursor: pointer;
+            margin-top: 20px;
         }
         button:hover {
             background-color: #555;
@@ -131,20 +129,30 @@
             e.preventDefault();
             try {
                 const newStudent = {
-                    name: document.getElementById('studentName').value,
+                    studentName: document.getElementById('studentName').value,
                     address: document.getElementById('address').value,
                     batchTime: document.getElementById('batchTime').value,
                     admissionDate: document.getElementById('admissionDate').value,
                     whatsappNumber: document.getElementById('whatsappNumber').value,
                     phoneNumber: document.getElementById('phoneNumber').value,
-                    paidMonths: [] // Initialize paidMonths as an empty array
+                    paid_month1: false,
+                    paid_month2: false,
+                    paid_month3: false,
+                    paid_month4: false,
+                    paid_month5: false,
+                    paid_month6: false,
+                    paid_month7: false,
+                    paid_month8: false,
+                    paid_month9: false,
+                    paid_month10: false,
+                    paid_month11: false,
+                    paid_month12: false
                 };
                 await addDoc(collection(db, 'students'), newStudent);
                 alert('Student added successfully!');
                 this.reset();
             } catch (error) {
                 console.error('Error adding student: ', error);
-                alert('Error adding student. Please try again.');
             }
         });
     </script>
