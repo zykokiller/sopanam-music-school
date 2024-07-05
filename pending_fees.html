@@ -4,44 +4,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pending Fees - Sopanam Music School</title>
-    <!-- Firebase SDK -->
-    <script type="module" src="firebaseConfig.js"></script>
-    <script type="module">
-        import { getFirestore, collection, getDocs, where, query } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+    <style>
+        #mainMenu {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+        }
+        #mainMenu nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        #mainMenu nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        #mainMenu nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        #mainMenu nav ul li a:hover {
+            background-color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div id="mainMenu">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add_students.html">Add Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="pending_fees.html">Pending Fees</a></li>
+            </ul>
+        </nav>
+    </div>
+    <h1>Pending Fees - Sopanam Music School</h1>
 
-        const db = getFirestore();
+    <table id="pendingFeesTable">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Batch Time</th>
+                <th>Unpaid Months</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Pending fees students will be dynamically added here -->
+        </tbody>
+    </table>
 
-        async function loadPendingFees() {
-            const studentsRef = collection(db, 'students');
-            const querySnapshot = await getDocs(query(studentsRef, where("paidMonths", "==", [])));
-            querySnapshot.forEach((doc) => {
-                const student = doc.data();
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.name}</td>
-                    <td>${student.batchTime}</td>
-                    <!-- Add additional student details as needed -->
-                `;
-                document.getElementById('pendingFeesTableBody').appendChild(row);
+    <script>
+        function initializeStudents() {
+            var students = JSON.parse(localStorage.getItem('students'));
+            if (!students) {
+                students = [];
+                localStorage.setItem('students', JSON.stringify(students));
+            }
+            return students;
+        }
+
+        function displayPendingFees() {
+            var students = initializeStudents();
+            var tbody = document.querySelector('#pendingFeesTable tbody');
+            tbody.innerHTML = '';
+
+            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            students.forEach(function(student) {
+                var unpaidMonths = [];
+                for (var i = 1; i <= 12; i++) {
+                    if (!student['paid_month' + i]) {
+                        unpaidMonths.push(months[i - 1]);
+                    }
+                }
+
+                if (unpaidMonths.length > 0) {
+                    var tr = document.createElement('tr');
+
+                    var tdName = document.createElement('td');
+                    tdName.textContent = student.studentName;
+                    tr.appendChild(tdName);
+
+                    var tdBatchTime = document.createElement('td');
+                    tdBatchTime.textContent = student.batchTime;
+                    tr.appendChild(tdBatchTime);
+
+                    var tdUnpaidMonths = document.createElement('td');
+                    tdUnpaidMonths.textContent = unpaidMonths.join(', ');
+                    tr.appendChild(tdUnpaidMonths);
+
+                    tbody.appendChild(tr);
+                }
             });
         }
 
-        document.addEventListener('DOMContentLoaded', loadPendingFees);
+        // Call function on page load
+        displayPendingFees();
     </script>
-</head>
-<body>
-    <h1>Pending Fees Page</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Batch Time</th>
-                <!-- Add headers for additional student details as needed -->
-            </tr>
-        </thead>
-        <tbody id="pendingFeesTableBody">
-            <!-- Pending fees data will be dynamically added here -->
-        </tbody>
-    </table>
 </body>
 </html>
