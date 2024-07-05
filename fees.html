@@ -5,49 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fees - Sopanam Music School</title>
     <!-- Firebase SDK -->
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    <script type="module" src="firebaseConfig.js"></script>
+    <script type="module">
+        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
-    authDomain: "sopanam-fees-site.firebaseapp.com",
-    projectId: "sopanam-fees-site",
-    storageBucket: "sopanam-fees-site.appspot.com",
-    messagingSenderId: "875694835618",
-    appId: "1:875694835618:web:f28cddc9758eddd40914fb",
-    measurementId: "G-JMR44EQ6M8"
-  };
+        const db = getFirestore();
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
         async function loadStudents() {
-            const querySnapshot = await getDocs(collection(db, "students"));
+            const studentsRef = collection(db, 'students');
+            const querySnapshot = await getDocs(studentsRef);
             querySnapshot.forEach((doc) => {
                 const student = doc.data();
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${student.name}</td>
                     <td>${student.batchTime}</td>
-                    <td>
-                        <label>
-                            <input type="checkbox" id="january_${doc.id}" onchange="updateFee('${doc.id}', 'January', this.checked)">
-                            January
-                        </label>
-                    </td>
-                    <td>
-                        <label>
-                            <input type="checkbox" id="february_${doc.id}" onchange="updateFee('${doc.id}', 'February', this.checked)">
-                            February
-                        </label>
-                    </td>
+                    <td><input type="checkbox" id="january_${doc.id}" onchange="updateFee('${doc.id}', 'January', this.checked)"></td>
+                    <td><input type="checkbox" id="february_${doc.id}" onchange="updateFee('${doc.id}', 'February', this.checked)"></td>
                     <!-- Add checkboxes for other months as needed -->
                 `;
                 document.getElementById('studentsTableBody').appendChild(row);
@@ -55,24 +29,19 @@
         }
 
         async function updateFee(studentId, month, isChecked) {
-            try {
-                const studentDocRef = doc(db, "students", studentId);
-                const studentDoc = await getDoc(studentDocRef);
-                if (studentDoc.exists()) {
-                    let updatedMonths = studentDoc.data().paidMonths || [];
-                    if (isChecked) {
-                        updatedMonths.push(month);
-                    } else {
-                        updatedMonths = updatedMonths.filter(m => m !== month);
-                    }
-                    await updateDoc(studentDocRef, { paidMonths: updatedMonths });
-                    alert('Fee updated successfully!');
+            const studentDocRef = doc(db, 'students', studentId);
+            const studentDoc = await getDoc(studentDocRef);
+            if (studentDoc.exists()) {
+                let updatedMonths = studentDoc.data().paidMonths || [];
+                if (isChecked && !updatedMonths.includes(month)) {
+                    updatedMonths.push(month);
                 } else {
-                    console.log("No such document!");
+                    updatedMonths = updatedMonths.filter(m => m !== month);
                 }
-            } catch (error) {
-                console.error("Error updating fee: ", error);
-                alert('Failed to update fee. Please try again later.');
+                await updateDoc(studentDocRef, { paidMonths: updatedMonths });
+                alert(`Fee for ${month} updated successfully!`);
+            } else {
+                console.log('No such document!');
             }
         }
 
