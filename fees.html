@@ -4,13 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fees - Sopanam Music School</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #mainMenu {
+            background-color: #333;
+            padding: 10px;
+            text-align: center;
+        }
+        #mainMenu nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        #mainMenu nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        #mainMenu nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        #mainMenu nav ul li a:hover {
+            background-color: #555;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+    </style>
 </head>
 <body>
-    <h1>Fees Page</h1>
+    <div id="mainMenu">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add_students.html">Add Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="pending_fees.html">Pending Fees</a></li>
+            </ul>
+        </nav>
+    </div>
+    <h1>Fees - Sopanam Music School</h1>
     <table>
         <thead>
             <tr>
-                <th>Name</th>
+                <th>Student Name</th>
                 <th>Batch Time</th>
                 <th>January</th>
                 <th>February</th>
@@ -27,7 +98,6 @@
             </tr>
         </thead>
         <tbody id="feesTableBody">
-            <!-- Fee data will be dynamically added here -->
         </tbody>
     </table>
 
@@ -52,53 +122,49 @@
         const db = getFirestore(app);
 
         async function loadFees() {
-            const studentsRef = collection(db, 'students');
-            const querySnapshot = await getDocs(studentsRef);
+            const querySnapshot = await getDocs(collection(db, 'students'));
+            const feesTableBody = document.getElementById('feesTableBody');
             querySnapshot.forEach((doc) => {
                 const student = doc.data();
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${student.name}</td>
                     <td>${student.batchTime}</td>
-                    ${generateMonthCheckboxes(doc.id, student.paidMonths)}
+                    ${generateCheckboxes(student, doc.id)}
                 `;
-                document.getElementById('feesTableBody').appendChild(row);
+                feesTableBody.appendChild(row);
             });
         }
 
-        function generateMonthCheckboxes(studentId, paidMonths) {
-            const months = [
-                "January", "February", "March", "April", "May", "June", 
-                "July", "August", "September", "October", "November", "December"
-            ];
-            return months.map((month, index) => `
-                <td>
-                    <input type="checkbox" id="${studentId}_${index}" ${paidMonths.includes(index + 1) ? 'checked' : ''} 
-                           onchange="updateFee('${studentId}', ${index + 1}, this.checked)">
-                </td>
-            `).join('');
+        function generateCheckboxes(student, docId) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            return months.map((month, index) => {
+                const checked = student.paidMonths.includes(index + 1) ? 'checked' : '';
+                return `<td><input type="checkbox" ${checked} onchange="updatePaymentStatus('${docId}', ${index + 1}, this.checked)"></td>`;
+            }).join('');
         }
 
-        async function updateFee(studentId, month, isChecked) {
-            const studentRef = doc(db, 'students', studentId);
+        window.updatePaymentStatus = async function(docId, month, status) {
+            const studentRef = doc(db, 'students', docId);
             const studentDoc = await studentRef.get();
-            const paidMonths = studentDoc.data().paidMonths || [];
+            const student = studentDoc.data();
+            const paidMonths = student.paidMonths;
 
-            if (isChecked) {
+            if (status) {
                 if (!paidMonths.includes(month)) {
                     paidMonths.push(month);
                 }
             } else {
-                const monthIndex = paidMonths.indexOf(month);
-                if (monthIndex > -1) {
-                    paidMonths.splice(monthIndex, 1);
+                const index = paidMonths.indexOf(month);
+                if (index > -1) {
+                    paidMonths.splice(index, 1);
                 }
             }
 
             await updateDoc(studentRef, { paidMonths });
-        }
+        };
 
-        document.addEventListener('DOMContentLoaded', loadFees);
+        window.onload = loadFees;
     </script>
 </body>
 </html>
