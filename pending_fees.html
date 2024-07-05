@@ -51,18 +51,6 @@
         th {
             background-color: #f2f2f2;
         }
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #333;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #555;
-        }
     </style>
 </head>
 <body>
@@ -82,7 +70,6 @@
         <thead>
             <tr>
                 <th>Student Name</th>
-                <th>Batch Time</th>
                 <th>Pending Months</th>
             </tr>
         </thead>
@@ -115,22 +102,21 @@
             const pendingFeesTableBody = document.getElementById('pendingFeesTableBody');
             querySnapshot.forEach((doc) => {
                 const student = doc.data();
-                const pendingMonths = getPendingMonths(student);
+                const pendingMonths = [];
+                for (let i = 1; i <= 12; i++) {
+                    if (!student[`paid_month${i}`]) {
+                        pendingMonths.push(new Date(2000, i - 1).toLocaleString('default', { month: 'long' }));
+                    }
+                }
                 if (pendingMonths.length > 0) {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${student.studentName}</td>
-                        <td>${student.batchTime}</td>
                         <td>${pendingMonths.join(', ')}</td>
                     `;
                     pendingFeesTableBody.appendChild(row);
                 }
             });
-        }
-
-        function getPendingMonths(student) {
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            return months.filter((month, index) => !student[`paid_month${index + 1}`]);
         }
 
         window.onload = loadPendingFees;
