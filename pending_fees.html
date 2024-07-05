@@ -4,19 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pending Fees - Sopanam Music School</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #mainMenu {
+            background-color: #333;
+            padding: 10px;
+            text-align: center;
+        }
+        #mainMenu nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        #mainMenu nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        #mainMenu nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        #mainMenu nav ul li a:hover {
+            background-color: #555;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
-    <h1>Pending Fees Page</h1>
+    <div id="mainMenu">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add_students.html">Add Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="pending_fees.html">Pending Fees</a></li>
+            </ul>
+        </nav>
+    </div>
+    <h1>Pending Fees - Sopanam Music School</h1>
     <table>
         <thead>
             <tr>
-                <th>Name</th>
+                <th>Student Name</th>
                 <th>Batch Time</th>
                 <th>Unpaid Months</th>
             </tr>
         </thead>
         <tbody id="pendingFeesTableBody">
-            <!-- Pending fees data will be dynamically added here -->
         </tbody>
     </table>
 
@@ -41,11 +99,11 @@
         const db = getFirestore(app);
 
         async function loadPendingFees() {
-            const studentsRef = collection(db, 'students');
-            const querySnapshot = await getDocs(studentsRef);
+            const querySnapshot = await getDocs(collection(db, 'students'));
+            const pendingFeesTableBody = document.getElementById('pendingFeesTableBody');
             querySnapshot.forEach((doc) => {
                 const student = doc.data();
-                const unpaidMonths = getUnpaidMonths(student.paidMonths || []);
+                const unpaidMonths = getUnpaidMonths(student.paidMonths);
                 if (unpaidMonths.length > 0) {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -53,20 +111,17 @@
                         <td>${student.batchTime}</td>
                         <td>${unpaidMonths.join(', ')}</td>
                     `;
-                    document.getElementById('pendingFeesTableBody').appendChild(row);
+                    pendingFeesTableBody.appendChild(row);
                 }
             });
         }
 
         function getUnpaidMonths(paidMonths) {
-            const months = [
-                "January", "February", "March", "April", "May", "June", 
-                "July", "August", "September", "October", "November", "December"
-            ];
-            return months.filter((_, index) => !paidMonths.includes(index + 1));
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            return months.filter((month, index) => !paidMonths.includes(index + 1));
         }
 
-        document.addEventListener('DOMContentLoaded', loadPendingFees);
+        window.onload = loadPendingFees;
     </script>
 </body>
 </html>
