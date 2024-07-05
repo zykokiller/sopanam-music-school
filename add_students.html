@@ -4,43 +4,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Students - Sopanam Music School</title>
-    <!-- Firebase SDK -->
-    <script type="module" src="firebaseConfig.js"></script>
-    <script type="module">
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-
-        const db = getFirestore();
-
-        async function addStudent() {
-            const form = document.getElementById('addStudentForm');
-            const name = form.name.value;
-            const address = form.address.value;
-            const batchTime = form.batchTime.value;
-            const dateOfAdmission = form.dateOfAdmission.value;
-            const whatsappNumber = form.whatsappNumber.value;
-            const phoneNumber = form.phoneNumber.value;
-
-            try {
-                await addDoc(collection(db, 'students'), {
-                    name,
-                    address,
-                    batchTime,
-                    dateOfAdmission,
-                    whatsappNumber,
-                    phoneNumber,
-                    paidMonths: [] // Initialize paidMonths as an empty array
-                });
-                alert('Student added successfully!');
-                form.reset(); // Clear form fields after submission
-            } catch (error) {
-                console.error('Error adding document: ', error);
-                alert('Error adding student. Please try again.');
-            }
+    <style>
+        #mainMenu {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
         }
-    </script>
+        #mainMenu nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        #mainMenu nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        #mainMenu nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        #mainMenu nav ul li a:hover {
+            background-color: #555;
+        }
+        form {
+            margin-top: 20px;
+        }
+        form div {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Add Students Page</h1>
-    <form id="addStudentForm" onsubmit="event.preventDefault(); addStudent()">
-        <label for="name">Name:</label>
-        <input type="text" id
+    <div id="mainMenu">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add_students.html">Add Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="pending_fees.html">Pending Fees</a></li>
+            </ul>
+        </nav>
+    </div>
+    <h1>Add Students - Sopanam Music School</h1>
+    <form id="addStudentForm">
+        <div>
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" name="studentName" required>
+        </div>
+        <div>
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" required>
+        </div>
+        <div>
+            <label for="batchTime">Batch Time:</label>
+            <input type="text" id="batchTime" name="batchTime" required>
+        </div>
+        <div>
+            <label for="admissionDate">Date of Admission:</label>
+            <input type="date" id="admissionDate" name="admissionDate" required>
+        </div>
+        <div>
+            <label for="whatsappNumber">WhatsApp Number:</label>
+            <input type="text" id="whatsappNumber" name="whatsappNumber" required>
+        </div>
+        <div>
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" required>
+        </div>
+        <button type="submit">Add Student</button>
+    </form>
+
+    <script>
+        document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var students = JSON.parse(localStorage.getItem('students')) || [];
+            var newStudent = {
+                studentName: document.getElementById('studentName').value,
+                address: document.getElementById('address').value,
+                batchTime: document.getElementById('batchTime').value,
+                admissionDate: document.getElementById('admissionDate').value,
+                whatsappNumber: document.getElementById('whatsappNumber').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                paid_month1: false,
+                paid_month2: false,
+                paid_month3: false,
+                paid_month4: false,
+                paid_month5: false,
+                paid_month6: false,
+                paid_month7: false,
+                paid_month8: false,
+                paid_month9: false,
+                paid_month10: false,
+                paid_month11: false,
+                paid_month12: false
+            };
+            students.push(newStudent);
+            localStorage.setItem('students', JSON.stringify(students));
+            alert('Student added successfully!');
+            this.reset();
+        });
+    </script>
+</body>
+</html>
