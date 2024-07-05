@@ -59,6 +59,7 @@
             color: #fff;
             border: none;
             cursor: pointer;
+            margin-top: 20px;
         }
         button:hover {
             background-color: #555;
@@ -100,6 +101,7 @@
         <tbody id="feesTableBody">
         </tbody>
     </table>
+    <button id="saveButton">Save</button>
 
     <script type="module">
         // Import Firebase functions
@@ -140,14 +142,23 @@
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             return months.map((month, index) => {
                 const paid = student[`paid_month${index + 1}`];
-                return `<td><input type="checkbox" ${paid ? 'checked' : ''} onchange="updatePaymentStatus('${docId}', ${index + 1}, this.checked)"></td>`;
+                return `<td><input type="checkbox" ${paid ? 'checked' : ''} data-doc-id="${docId}" data-month="${index + 1}"></td>`;
             }).join('');
         }
 
-        window.updatePaymentStatus = async function(docId, month, status) {
-            const studentRef = doc(db, 'students', docId);
-            await updateDoc(studentRef, { [`paid_month${month}`]: status });
-        };
+        async function saveFees() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            for (const checkbox of checkboxes) {
+                const docId = checkbox.getAttribute('data-doc-id');
+                const month = checkbox.getAttribute('data-month');
+                const status = checkbox.checked;
+                const studentRef = doc(db, 'students', docId);
+                await updateDoc(studentRef, { [`paid_month${month}`]: status });
+            }
+            alert('Fees status updated successfully!');
+        }
+
+        document.getElementById('saveButton').addEventListener('click', saveFees);
 
         window.onload = loadFees;
     </script>
