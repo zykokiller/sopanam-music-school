@@ -41,10 +41,10 @@
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
-                <li><a href="add_students.html">Add Students</a></li>
+                <li><a href="addstudents.html">Add Students</a></li>
                 <li><a href="fees.html">Fees</a></li>
                 <li><a href="students.html">Students</a></li>
-                <li><a href="pending_fees.html">Pending Fees</a></li>
+                <li><a href="pendingfees.html">Pending Fees</a></li>
             </ul>
         </nav>
     </div>
@@ -78,55 +78,44 @@
     </form>
 
     <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
-    authDomain: "sopanam-fees-site.firebaseapp.com",
-    projectId: "sopanam-fees-site",
-    storageBucket: "sopanam-fees-site.appspot.com",
-    messagingSenderId: "875694835618",
-    appId: "1:875694835618:web:f28cddc9758eddd40914fb",
-    measurementId: "G-JMR44EQ6M8"
-  };
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
+            authDomain: "sopanam-fees-site.firebaseapp.com",
+            projectId: "sopanam-fees-site",
+            storageBucket: "sopanam-fees-site.appspot.com",
+            messagingSenderId: "875694835618",
+            appId: "1:875694835618:web:f28cddc9758eddd40914fb",
+            measurementId: "G-JMR44EQ6M8"
+        };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-        
-        document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('addStudentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            var students = JSON.parse(localStorage.getItem('students')) || [];
-            var newStudent = {
-                studentName: document.getElementById('studentName').value,
-                address: document.getElementById('address').value,
-                batchTime: document.getElementById('batchTime').value,
-                admissionDate: document.getElementById('admissionDate').value,
-                whatsappNumber: document.getElementById('whatsappNumber').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
-                paid_month1: false,
-                paid_month2: false,
-                paid_month3: false,
-                paid_month4: false,
-                paid_month5: false,
-                paid_month6: false,
-                paid_month7: false,
-                paid_month8: false,
-                paid_month9: false,
-                paid_month10: false,
-                paid_month11: false,
-                paid_month12: false
-            };
-            students.push(newStudent);
-            localStorage.setItem('students', JSON.stringify(students));
-            alert('Student added successfully!');
-            this.reset();
+            try {
+                const newStudent = {
+                    name: document.getElementById('studentName').value,
+                    address: document.getElementById('address').value,
+                    batchTime: document.getElementById('batchTime').value,
+                    admissionDate: document.getElementById('admissionDate').value,
+                    whatsappNumber: document.getElementById('whatsappNumber').value,
+                    phoneNumber: document.getElementById('phoneNumber').value,
+                    paidMonths: [] // Initialize paidMonths as an empty array
+                };
+                await addDoc(collection(db, 'students'), newStudent);
+                alert('Student added successfully!');
+                this.reset();
+            } catch (error) {
+                console.error('Error adding student: ', error);
+                alert('Error adding student. Please try again.');
+            }
         });
     </script>
 </body>
