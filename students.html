@@ -46,6 +46,48 @@
             cursor: pointer;
         }
     </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
+            authDomain: "sopanam-fees-site.firebaseapp.com",
+            projectId: "sopanam-fees-site",
+            storageBucket: "sopanam-fees-site.appspot.com",
+            messagingSenderId: "875694835618",
+            appId: "1:875694835618:web:f28cddc9758eddd40914fb",
+            measurementId: "G-JMR44EQ6M8"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadStudents() {
+            const querySnapshot = await getDocs(collection(db, "students"));
+            querySnapshot.forEach((doc) => {
+                const student = doc.data();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.address}</td>
+                    <td>${student.batchTime}</td>
+                    <td>${student.admissionDate}</td>
+                    <td>${student.whatsappNumber}</td>
+                    <td>${student.phoneNumber}</td>
+                    <td><span class="delete-button" onclick="deleteStudent('${doc.id}')">Delete</span></td>
+                `;
+                document.getElementById('studentsTableBody').appendChild(row);
+            });
+        }
+
+        async function deleteStudent(id) {
+            await deleteDoc(doc(db, "students", id));
+            alert('Student deleted successfully!');
+            location.reload();
+        }
+
+        document.addEventListener('DOMContentLoaded', loadStudents);
+    </script>
 </head>
 <body>
     <div id="mainMenu">
@@ -69,43 +111,10 @@
                 <th>Date of Admission</th>
                 <th>WhatsApp Number</th>
                 <th>Phone Number</th>
-                <th>Delete</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody id="studentsTableBody"></tbody>
     </table>
-
-    <script>
-        function loadStudents() {
-            let students = JSON.parse(localStorage.getItem('students')) || [];
-            let tableBody = document.getElementById('studentsTableBody');
-            tableBody.innerHTML = '';
-
-            students.forEach((student, index) => {
-                let row = document.createElement('tr');
-
-                row.innerHTML = `
-                    <td>${student.name}</td>
-                    <td>${student.address}</td>
-                    <td>${student.batchTime}</td>
-                    <td>${student.admissionDate}</td>
-                    <td>${student.whatsappNumber}</td>
-                    <td>${student.phoneNumber}</td>
-                    <td><span class="delete-button" onclick="deleteStudent(${index})">Delete</span></td>
-                `;
-
-                tableBody.appendChild(row);
-            });
-        }
-
-        function deleteStudent(index) {
-            let students = JSON.parse(localStorage.getItem('students')) || [];
-            students.splice(index, 1);
-            localStorage.setItem('students', JSON.stringify(students));
-            loadStudents();
-        }
-
-        window.onload = loadStudents;
-    </script>
 </body>
 </html>
