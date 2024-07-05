@@ -51,18 +51,15 @@
         th {
             background-color: #f2f2f2;
         }
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #333;
-            color: #fff;
+        .delete-button {
+            background-color: #d9534f;
+            color: white;
             border: none;
+            padding: 5px 10px;
             cursor: pointer;
-            margin-top: 20px;
         }
-        button:hover {
-            background-color: #555;
+        .delete-button:hover {
+            background-color: #c9302c;
         }
     </style>
 </head>
@@ -88,6 +85,7 @@
                 <th>Date of Admission</th>
                 <th>WhatsApp Number</th>
                 <th>Phone Number</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody id="studentsTableBody">
@@ -97,7 +95,7 @@
     <script type="module">
         // Import Firebase functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -127,9 +125,22 @@
                     <td>${student.admissionDate}</td>
                     <td>${student.whatsappNumber}</td>
                     <td>${student.phoneNumber}</td>
+                    <td><button class="delete-button" data-doc-id="${doc.id}">Delete</button></td>
                 `;
                 studentsTableBody.appendChild(row);
             });
+
+            // Add event listener for delete buttons
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', deleteStudent);
+            });
+        }
+
+        async function deleteStudent(event) {
+            const docId = event.target.getAttribute('data-doc-id');
+            await deleteDoc(doc(db, 'students', docId));
+            alert('Student deleted successfully!');
+            location.reload(); // Reload the page to reflect the changes
         }
 
         window.onload = loadStudents;
