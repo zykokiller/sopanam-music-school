@@ -49,74 +49,63 @@
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="add_students.html">Add Students</a></li>
-                <li><a href="fees.html">Fees</a></li>
                 <li><a href="students.html">Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
                 <li><a href="pending_fees.html">Pending Fees</a></li>
             </ul>
         </nav>
     </div>
-    <h1>Pending Fees - Sopanam Music School</h1>
-
-    <table id="pendingFeesTable">
+    <h2>Pending Fees</h2>
+    <table>
         <thead>
             <tr>
-                <th>Student Name</th>
+                <th>Name</th>
                 <th>Batch Time</th>
                 <th>Unpaid Months</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Pending fees students will be dynamically added here -->
-        </tbody>
+        <tbody id="pendingFeesTableBody"></tbody>
     </table>
 
     <script>
-        function initializeStudents() {
-            var students = JSON.parse(localStorage.getItem('students'));
-            if (!students) {
-                students = [];
-                localStorage.setItem('students', JSON.stringify(students));
-            }
-            return students;
-        }
+        function loadPendingFees() {
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            let fees = JSON.parse(localStorage.getItem('fees')) || {};
+            let tableBody = document.getElementById('pendingFeesTableBody');
+            tableBody.innerHTML = '';
 
-        function displayPendingFees() {
-            var students = initializeStudents();
-            var tbody = document.querySelector('#pendingFeesTable tbody');
-            tbody.innerHTML = '';
-
-            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-            students.forEach(function(student) {
-                var unpaidMonths = [];
-                for (var i = 1; i <= 12; i++) {
-                    if (!student['paid_month' + i]) {
-                        unpaidMonths.push(months[i - 1]);
-                    }
-                }
-
+            students.forEach(student => {
+                let unpaidMonths = getUnpaidMonths(student.name, fees);
                 if (unpaidMonths.length > 0) {
-                    var tr = document.createElement('tr');
+                    let row = document.createElement('tr');
 
-                    var tdName = document.createElement('td');
-                    tdName.textContent = student.studentName;
-                    tr.appendChild(tdName);
+                    row.innerHTML = `
+                        <td>${student.name}</td>
+                        <td>${student.batchTime}</td>
+                        <td>${unpaidMonths.join(', ')}</td>
+                    `;
 
-                    var tdBatchTime = document.createElement('td');
-                    tdBatchTime.textContent = student.batchTime;
-                    tr.appendChild(tdBatchTime);
-
-                    var tdUnpaidMonths = document.createElement('td');
-                    tdUnpaidMonths.textContent = unpaidMonths.join(', ');
-                    tr.appendChild(tdUnpaidMonths);
-
-                    tbody.appendChild(tr);
+                    tableBody.appendChild(row);
                 }
             });
         }
 
-        // Call function on page load
-        displayPendingFees();
+        function getUnpaidMonths(name, fees) {
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            let unpaidMonths = [];
+            if (fees[name]) {
+                fees[name].forEach((paid, index) => {
+                    if (!paid) {
+                        unpaidMonths.push(months[index]);
+                    }
+                });
+            } else {
+                unpaidMonths = months; // If no fee record exists, consider all months unpaid
+            }
+            return unpaidMonths;
+        }
+
+        window.onload = loadPendingFees;
     </script>
 </body>
 </html>
