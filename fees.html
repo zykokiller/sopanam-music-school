@@ -101,7 +101,6 @@
         <tbody id="feesTableBody">
         </tbody>
     </table>
-    <button id="saveButton">Save</button>
 
     <script type="module">
         // Import Firebase functions
@@ -136,6 +135,11 @@
                 `;
                 feesTableBody.appendChild(row);
             });
+
+            // Add event listener for checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', updateFeeStatus);
+            });
         }
 
         function generateCheckboxes(student, docId) {
@@ -146,19 +150,14 @@
             }).join('');
         }
 
-        async function saveFees() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            for (const checkbox of checkboxes) {
-                const docId = checkbox.getAttribute('data-doc-id');
-                const month = checkbox.getAttribute('data-month');
-                const status = checkbox.checked;
-                const studentRef = doc(db, 'students', docId);
-                await updateDoc(studentRef, { [`paid_month${month}`]: status });
-            }
-            alert('Fees status updated successfully!');
+        async function updateFeeStatus(event) {
+            const checkbox = event.target;
+            const docId = checkbox.getAttribute('data-doc-id');
+            const month = checkbox.getAttribute('data-month');
+            const status = checkbox.checked;
+            const studentRef = doc(db, 'students', docId);
+            await updateDoc(studentRef, { [`paid_month${month}`]: status });
         }
-
-        document.getElementById('saveButton').addEventListener('click', saveFees);
 
         window.onload = loadFees;
     </script>
