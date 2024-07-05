@@ -3,17 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sopanam Music School</title>
+    <title>Add Students - Sopanam Music School</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #mainMenu {
+            background-color: #333;
+            padding: 10px;
+            text-align: center;
+        }
+        #mainMenu nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        #mainMenu nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        #mainMenu nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        #mainMenu nav ul li a:hover {
+            background-color: #555;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+        form {
+            width: 300px;
+            margin: 0 auto;
+        }
+        form div {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to Sopanam Music School</h1>
-    <nav>
-        <ul>
-            <li><a href="addstudents.html">Add Students</a></li>
-            <li><a href="fees.html">Fees</a></li>
-            <li><a href="students.html">Students</a></li>
-            <li><a href="pendingfees.html">Pending Fees</a></li>
-        </ul>
-    </nav>
+    <div id="mainMenu">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="addstudents.html">Add Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="pendingfees.html">Pending Fees</a></li>
+            </ul>
+        </nav>
+    </div>
+    <h1>Add Students - Sopanam Music School</h1>
+    <form id="addStudentForm">
+        <div>
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" name="studentName" required>
+        </div>
+        <div>
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" required>
+        </div>
+        <div>
+            <label for="batchTime">Batch Time:</label>
+            <input type="text" id="batchTime" name="batchTime" required>
+        </div>
+        <div>
+            <label for="admissionDate">Date of Admission:</label>
+            <input type="date" id="admissionDate" name="admissionDate" required>
+        </div>
+        <div>
+            <label for="whatsappNumber">WhatsApp Number:</label>
+            <input type="text" id="whatsappNumber" name="whatsappNumber" required>
+        </div>
+        <div>
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" required>
+        </div>
+        <button type="submit">Add Student</button>
+    </form>
+
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
+            authDomain: "sopanam-fees-site.firebaseapp.com",
+            projectId: "sopanam-fees-site",
+            storageBucket: "sopanam-fees-site.appspot.com",
+            messagingSenderId: "875694835618",
+            appId: "1:875694835618:web:f28cddc9758eddd40914fb",
+            measurementId: "G-JMR44EQ6M8"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('addStudentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            try {
+                const newStudent = {
+                    name: document.getElementById('studentName').value,
+                    address: document.getElementById('address').value,
+                    batchTime: document.getElementById('batchTime').value,
+                    admissionDate: document.getElementById('admissionDate').value,
+                    whatsappNumber: document.getElementById('whatsappNumber').value,
+                    phoneNumber: document.getElementById('phoneNumber').value,
+                    paidMonths: [] // Initialize paidMonths as an empty array
+                };
+                await addDoc(collection(db, 'students'), newStudent);
+                alert('Student added successfully!');
+                this.reset();
+            } catch (error) {
+                console.error('Error adding student: ', error);
+                alert('Error adding student. Please try again.');
+            }
+        });
+    </script>
 </body>
 </html>
