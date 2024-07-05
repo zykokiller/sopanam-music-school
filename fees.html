@@ -4,63 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fees - Sopanam Music School</title>
-    <style>
-        #mainMenu {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-        }
-        #mainMenu nav ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        #mainMenu nav ul li {
-            display: inline;
-            margin-right: 10px;
-        }
-        #mainMenu nav ul li a {
-            color: #fff;
-            text-decoration: none;
-            padding: 5px 10px;
-        }
-        #mainMenu nav ul li a:hover {
-            background-color: #555;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
 </head>
 <body>
-    <div id="mainMenu">
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="add_students.html">Add Students</a></li>
-                <li><a href="fees.html">Fees</a></li>
-                <li><a href="students.html">Students</a></li>
-                <li><a href="pending_fees.html">Pending Fees</a></li>
-            </ul>
-        </nav>
-    </div>
-    <h1>Fees - Sopanam Music School</h1>
-
-    <table id="feesTable">
+    <h1>Fees Page</h1>
+    <table>
         <thead>
             <tr>
-                <th>Student Name</th>
+                <th>Name</th>
                 <th>Batch Time</th>
                 <th>January</th>
                 <th>February</th>
@@ -76,82 +26,79 @@
                 <th>December</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Fees information will be dynamically added here -->
+        <tbody id="feesTableBody">
+            <!-- Fee data will be dynamically added here -->
         </tbody>
     </table>
 
     <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
-    authDomain: "sopanam-fees-site.firebaseapp.com",
-    projectId: "sopanam-fees-site",
-    storageBucket: "sopanam-fees-site.appspot.com",
-    messagingSenderId: "875694835618",
-    appId: "1:875694835618:web:f28cddc9758eddd40914fb",
-    measurementId: "G-JMR44EQ6M8"
-  };
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
+            authDomain: "sopanam-fees-site.firebaseapp.com",
+            projectId: "sopanam-fees-site",
+            storageBucket: "sopanam-fees-site.appspot.com",
+            messagingSenderId: "875694835618",
+            appId: "1:875694835618:web:f28cddc9758eddd40914fb",
+            measurementId: "G-JMR44EQ6M8"
+        };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-        function initializeStudents() {
-            var students = JSON.parse(localStorage.getItem('students'));
-            if (!students) {
-                students = [];
-                localStorage.setItem('students', JSON.stringify(students));
-            }
-            return students;
-        }
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        function displayStudents() {
-            var students = initializeStudents();
-            var tbody = document.querySelector('#feesTable tbody');
-            tbody.innerHTML = '';
-
-            students.forEach(function(student, index) {
-                var tr = document.createElement('tr');
-
-                var tdName = document.createElement('td');
-                tdName.textContent = student.studentName;
-                tr.appendChild(tdName);
-
-                var tdBatchTime = document.createElement('td');
-                tdBatchTime.textContent = student.batchTime;
-                tr.appendChild(tdBatchTime);
-
-                for (var i = 1; i <= 12; i++) {
-                    var td = document.createElement('td');
-                    var checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.checked = student['paid_month' + i] || false;
-                    checkbox.dataset.studentIndex = index;
-                    checkbox.dataset.month = 'paid_month' + i;
-                    checkbox.addEventListener('change', function() {
-                        var students = initializeStudents();
-                        var studentIndex = this.dataset.studentIndex;
-                        var month = this.dataset.month;
-                        students[studentIndex][month] = this.checked;
-                        localStorage.setItem('students', JSON.stringify(students));
-                    });
-                    td.appendChild(checkbox);
-                    tr.appendChild(td);
-                }
-
-                tbody.appendChild(tr);
+        async function loadFees() {
+            const studentsRef = collection(db, 'students');
+            const querySnapshot = await getDocs(studentsRef);
+            querySnapshot.forEach((doc) => {
+                const student = doc.data();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.batchTime}</td>
+                    ${generateMonthCheckboxes(doc.id, student.paidMonths)}
+                `;
+                document.getElementById('feesTableBody').appendChild(row);
             });
         }
 
-        // Call function on page load
-        displayStudents();
+        function generateMonthCheckboxes(studentId, paidMonths) {
+            const months = [
+                "January", "February", "March", "April", "May", "June", 
+                "July", "August", "September", "October", "November", "December"
+            ];
+            return months.map((month, index) => `
+                <td>
+                    <input type="checkbox" id="${studentId}_${index}" ${paidMonths.includes(index + 1) ? 'checked' : ''} 
+                           onchange="updateFee('${studentId}', ${index + 1}, this.checked)">
+                </td>
+            `).join('');
+        }
+
+        async function updateFee(studentId, month, isChecked) {
+            const studentRef = doc(db, 'students', studentId);
+            const studentDoc = await studentRef.get();
+            const paidMonths = studentDoc.data().paidMonths || [];
+
+            if (isChecked) {
+                if (!paidMonths.includes(month)) {
+                    paidMonths.push(month);
+                }
+            } else {
+                const monthIndex = paidMonths.indexOf(month);
+                if (monthIndex > -1) {
+                    paidMonths.splice(monthIndex, 1);
+                }
+            }
+
+            await updateDoc(studentRef, { paidMonths });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadFees);
     </script>
 </body>
 </html>
