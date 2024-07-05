@@ -4,66 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Students - Sopanam Music School</title>
-    <style>
-        #mainMenu {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-        }
-        #mainMenu nav ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        #mainMenu nav ul li {
-            display: inline;
-            margin-right: 10px;
-        }
-        #mainMenu nav ul li a {
-            color: #fff;
-            text-decoration: none;
-            padding: 5px 10px;
-        }
-        #mainMenu nav ul li a:hover {
-            background-color: #555;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .delete-button {
-            color: red;
-            cursor: pointer;
-        }
-    </style>
+    <!-- Firebase SDK -->
+    <script type="module" src="firebaseConfig.js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
-            authDomain: "sopanam-fees-site.firebaseapp.com",
-            projectId: "sopanam-fees-site",
-            storageBucket: "sopanam-fees-site.appspot.com",
-            messagingSenderId: "875694835618",
-            appId: "1:875694835618:web:f28cddc9758eddd40914fb",
-            measurementId: "G-JMR44EQ6M8"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+        const db = getFirestore();
 
         async function loadStudents() {
-            const querySnapshot = await getDocs(collection(db, "students"));
+            const studentsRef = collection(db, 'students');
+            const querySnapshot = await getDocs(studentsRef);
             querySnapshot.forEach((doc) => {
                 const student = doc.data();
                 const row = document.createElement('tr');
@@ -71,37 +21,28 @@
                     <td>${student.name}</td>
                     <td>${student.address}</td>
                     <td>${student.batchTime}</td>
-                    <td>${student.admissionDate}</td>
+                    <td>${student.dateOfAdmission}</td>
                     <td>${student.whatsappNumber}</td>
                     <td>${student.phoneNumber}</td>
-                    <td><span class="delete-button" onclick="deleteStudent('${doc.id}')">Delete</span></td>
+                    <td><button onclick="deleteStudent('${doc.id}')">Delete</button></td>
                 `;
                 document.getElementById('studentsTableBody').appendChild(row);
             });
         }
 
-        async function deleteStudent(id) {
-            await deleteDoc(doc(db, "students", id));
-            alert('Student deleted successfully!');
-            location.reload();
+        async function deleteStudent(studentId) {
+            if (confirm("Are you sure you want to delete this student?")) {
+                await deleteDoc(doc(db, 'students', studentId));
+                alert("Student deleted successfully!");
+                location.reload(); // Refresh page
+            }
         }
 
         document.addEventListener('DOMContentLoaded', loadStudents);
     </script>
 </head>
 <body>
-    <div id="mainMenu">
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="add_students.html">Add Students</a></li>
-                <li><a href="students.html">Students</a></li>
-                <li><a href="fees.html">Fees</a></li>
-                <li><a href="pending_fees.html">Pending Fees</a></li>
-            </ul>
-        </nav>
-    </div>
-    <h2>Students</h2>
+    <h1>Students Page</h1>
     <table>
         <thead>
             <tr>
@@ -114,7 +55,9 @@
                 <th>Action</th>
             </tr>
         </thead>
-        <tbody id="studentsTableBody"></tbody>
+        <tbody id="studentsTableBody">
+            <!-- Student data will be dynamically added here -->
+        </tbody>
     </table>
 </body>
 </html>
