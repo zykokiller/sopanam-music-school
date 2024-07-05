@@ -5,48 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pending Fees - Sopanam Music School</title>
     <!-- Firebase SDK -->
+    <script type="module" src="firebaseConfig.js"></script>
     <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+        import { getFirestore, collection, getDocs, where, query } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
-    authDomain: "sopanam-fees-site.firebaseapp.com",
-    projectId: "sopanam-fees-site",
-    storageBucket: "sopanam-fees-site.appspot.com",
-    messagingSenderId: "875694835618",
-    appId: "1:875694835618:web:f28cddc9758eddd40914fb",
-    measurementId: "G-JMR44EQ6M8"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+        const db = getFirestore();
 
         async function loadPendingFees() {
-            try {
-                const pendingFeesQuery = query(collection(db, "students"), where("paidMonths", "==", []));
-                const querySnapshot = await getDocs(pendingFeesQuery);
-                querySnapshot.forEach((doc) => {
-                    const student = doc.data();
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${student.name}</td>
-                        <td>${student.batchTime}</td>
-                        <!-- Add additional student details as needed -->
-                    `;
-                    document.getElementById('pendingFeesTableBody').appendChild(row);
-                });
-            } catch (error) {
-                console.error("Error loading pending fees: ", error);
-                alert('Failed to load pending fees. Please try again later.');
-            }
+            const studentsRef = collection(db, 'students');
+            const querySnapshot = await getDocs(query(studentsRef, where("paidMonths", "==", [])));
+            querySnapshot.forEach((doc) => {
+                const student = doc.data();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.batchTime}</td>
+                    <!-- Add additional student details as needed -->
+                `;
+                document.getElementById('pendingFeesTableBody').appendChild(row);
+            });
         }
 
         document.addEventListener('DOMContentLoaded', loadPendingFees);
