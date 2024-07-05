@@ -64,6 +64,45 @@
             margin-left: .5em;
         }
     </style>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTdroN3i8PB8u8GeMDm_djZaw_lisgJ4M",
+            authDomain: "sopanam-fees-site.firebaseapp.com",
+            projectId: "sopanam-fees-site",
+            storageBucket: "sopanam-fees-site.appspot.com",
+            messagingSenderId: "875694835618",
+            appId: "1:875694835618:web:f28cddc9758eddd40914fb",
+            measurementId: "G-JMR44EQ6M8"
+        };
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('addStudentForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const student = {
+                name: document.getElementById('name').value,
+                address: document.getElementById('address').value,
+                batchTime: document.getElementById('batchTime').value,
+                admissionDate: document.getElementById('admissionDate').value,
+                whatsappNumber: document.getElementById('whatsappNumber').value,
+                phoneNumber: document.getElementById('phoneNumber').value
+            };
+
+            try {
+                await addDoc(collection(db, "students"), student);
+                alert('Student added successfully!');
+                document.getElementById('addStudentForm').reset();
+            } catch (error) {
+                console.error("Error adding student: ", error);
+            }
+        });
+    </script>
 </head>
 <body>
     <div id="mainMenu">
@@ -107,26 +146,5 @@
             <button type="submit">Add Student</button>
         </div>
     </form>
-
-    <script>
-        document.getElementById('addStudentForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            let students = JSON.parse(localStorage.getItem('students')) || [];
-            let student = {
-                name: document.getElementById('name').value,
-                address: document.getElementById('address').value,
-                batchTime: document.getElementById('batchTime').value,
-                admissionDate: document.getElementById('admissionDate').value,
-                whatsappNumber: document.getElementById('whatsappNumber').value,
-                phoneNumber: document.getElementById('phoneNumber').value
-            };
-
-            students.push(student);
-            localStorage.setItem('students', JSON.stringify(students));
-            alert('Student added successfully!');
-            document.getElementById('addStudentForm').reset();
-        });
-    </script>
 </body>
 </html>
