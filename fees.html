@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fees - Sopanam Music School</title>
+    <style>
+        #mainMenu {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+        }
+        #mainMenu nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        #mainMenu nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        #mainMenu nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        #mainMenu nav ul li a:hover {
+            background-color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div id="mainMenu">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add_students.html">Add Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="pending_fees.html">Pending Fees</a></li>
+            </ul>
+        </nav>
+    </div>
+    <h1>Fees - Sopanam Music School</h1>
+
+    <table id="feesTable">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Batch Time</th>
+                <th>January</th>
+                <th>February</th>
+                <th>March</th>
+                <th>April</th>
+                <th>May</th>
+                <th>June</th>
+                <th>July</th>
+                <th>August</th>
+                <th>September</th>
+                <th>October</th>
+                <th>November</th>
+                <th>December</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Fees information will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <script>
+        function initializeStudents() {
+            var students = JSON.parse(localStorage.getItem('students'));
+            if (!students) {
+                students = [];
+                localStorage.setItem('students', JSON.stringify(students));
+            }
+            return students;
+        }
+
+        function displayStudents() {
+            var students = initializeStudents();
+            var tbody = document.querySelector('#feesTable tbody');
+            tbody.innerHTML = '';
+
+            students.forEach(function(student, index) {
+                var tr = document.createElement('tr');
+
+                var tdName = document.createElement('td');
+                tdName.textContent = student.studentName;
+                tr.appendChild(tdName);
+
+                var tdBatchTime = document.createElement('td');
+                tdBatchTime.textContent = student.batchTime;
+                tr.appendChild(tdBatchTime);
+
+                for (var i = 1; i <= 12; i++) {
+                    var td = document.createElement('td');
+                    var checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = student['paid_month' + i] || false;
+                    checkbox.dataset.studentIndex = index;
+                    checkbox.dataset.month = 'paid_month' + i;
+                    checkbox.addEventListener('change', function() {
+                        var students = initializeStudents();
+                        var studentIndex = this.dataset.studentIndex;
+                        var month = this.dataset.month;
+                        students[studentIndex][month] = this.checked;
+                        localStorage.setItem('students', JSON.stringify(students));
+                    });
+                    td.appendChild(checkbox);
+                    tr.appendChild(td);
+                }
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Call function on page load
+        displayStudents();
+    </script>
+</body>
+</html>

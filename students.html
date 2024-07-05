@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students - Sopanam Music School</title>
+    <style>
+        #mainMenu {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+        }
+        #mainMenu nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        #mainMenu nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        #mainMenu nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        #mainMenu nav ul li a:hover {
+            background-color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .deleteBtn {
+            color: red;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="mainMenu">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add_students.html">Add Students</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="pending_fees.html">Pending Fees</a></li>
+            </ul>
+        </nav>
+    </div>
+    <h1>Students - Sopanam Music School</h1>
+
+    <table id="studentsTable">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Address</th>
+                <th>Batch Time</th>
+                <th>Date of Admission</th>
+                <th>WhatsApp Number</th>
+                <th>Phone Number</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Student information will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <script>
+        function initializeStudents() {
+            var students = JSON.parse(localStorage.getItem('students'));
+            if (!students) {
+                students = [];
+                localStorage.setItem('students', JSON.stringify(students));
+            }
+            return students;
+        }
+
+        function displayStudents() {
+            var students = initializeStudents();
+            var tbody = document.querySelector('#studentsTable tbody');
+            tbody.innerHTML = '';
+
+            students.forEach(function(student, index) {
+                var tr = document.createElement('tr');
+
+                var tdName = document.createElement('td');
+                tdName.textContent = student.studentName;
+                tr.appendChild(tdName);
+
+                var tdAddress = document.createElement('td');
+                tdAddress.textContent = student.address;
+                tr.appendChild(tdAddress);
+
+                var tdBatchTime = document.createElement('td');
+                tdBatchTime.textContent = student.batchTime;
+                tr.appendChild(tdBatchTime);
+
+                var tdAdmissionDate = document.createElement('td');
+                tdAdmissionDate.textContent = student.admissionDate;
+                tr.appendChild(tdAdmissionDate);
+
+                var tdWhatsappNumber = document.createElement('td');
+                tdWhatsappNumber.textContent = student.whatsappNumber;
+                tr.appendChild(tdWhatsappNumber);
+
+                var tdPhoneNumber = document.createElement('td');
+                tdPhoneNumber.textContent = student.phoneNumber;
+                tr.appendChild(tdPhoneNumber);
+
+                var tdActions = document.createElement('td');
+                var deleteBtn = document.createElement('span');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.classList.add('deleteBtn');
+                deleteBtn.dataset.index = index;
+                deleteBtn.addEventListener('click', function() {
+                    var students = initializeStudents();
+                    students.splice(this.dataset.index, 1);
+                    localStorage.setItem('students', JSON.stringify(students));
+                    displayStudents();
+                });
+                tdActions.appendChild(deleteBtn);
+                tr.appendChild(tdActions);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Call function on page load
+        displayStudents();
+    </script>
+</body>
+</html>
